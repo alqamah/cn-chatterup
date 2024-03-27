@@ -1,6 +1,7 @@
-// src/controllers/authController.js
+// src/controllers/auth.controller.js
+
 import bcrypt from 'bcrypt';
-import { UserModel } from '../models/userModel.js';
+import { userModel } from '../models/user.model.js';
 
 export const loginUser = async (data, socket) => {
   const { username, email, password } = data;

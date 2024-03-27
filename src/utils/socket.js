@@ -1,5 +1,5 @@
 // src/utils/socket.js
-import { loadMessages, sendMessage } from '../controllers/chatController.js';
+import { loadMessages, sendMessage } from '../controllers/chat.controller.js';
 
 export const setupSocketEvents = (io) => {
   io.on('connection', (socket) => {

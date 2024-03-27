@@ -1,3 +1,5 @@
+//src/models/chat.model.js
+
 import mongoose, { Mongoose } from 'mongoose';
 
 const chatSchema = new mongoose.Schema({
