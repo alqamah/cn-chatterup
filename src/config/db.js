@@ -9,3 +9,4 @@ export const connect = async()=>{
     });
     console.log("Db is connected");
 }
+

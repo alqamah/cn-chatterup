@@ -3,7 +3,7 @@
 import bcrypt from 'bcrypt';
 import { userModel } from '../models/user.model.js';
 
-export const loginUser = async (data, socket) => {
+export const loginUser = async (data, io, connectedUsers) => { // Accept io and connectedUsers as arguments
   const { username, email, password } = data;
 
   try {
@@ -11,38 +11,36 @@ export const loginUser = async (data, socket) => {
     const user = await userModel.findOne({ email });
 
     if (user) {
-        // User exists, verify password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+      // User exists, verify password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
 
-        if (isPasswordValid) {
-            // Password is valid, proceed with login
-            socket.username = user.username;
-            connectedUsers.push({ username: socket.username });
-            io.emit('user_joined', { username: socket.username, connectedUsers: connectedUsers });
-            //console.log(user);
-            // Redirect to index.html
-            socket.emit('redirect', '/index.html'+"?name="+user.username+"&id="+user.id);
-        } else {
-            // Invalid password
-            
-            socket.emit('login_error', 'Invalid password');
-        }
-    } else {
-        // User does not exist, create a new one
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new userModel({ username, email, password: hashedPassword });
-        const savedUser= await newUser.save();
-
-        // Proceed with login
-        socket.username = username;
-        connectedUsers.push({ username: socket.username });
-        io.emit('user_joined', { username: socket.username, connectedUsers: connectedUsers });
-        console.log('User created successfully');
+      if (isPasswordValid) {
+        // Password is valid, proceed with login
+        io.username = user.username;
+        connectedUsers.push({ username: io.username });
+        io.emit('user_joined', { username: io.username, connectedUsers });
         // Redirect to index.html
-        socket.emit('redirect', '/index.html'+"?name="+savedUser.username+"&id="+savedUser.id);
+        io.emit('redirect', '/index.html' + "?name=" + user.username + "&id=" + user.id);
+      } else {
+        // Invalid password
+        io.emit('login_error', 'Invalid password');
+      }
+    } else {
+      // User does not exist, create a new one
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new userModel({ username, email, password: hashedPassword });
+      const savedUser = await newUser.save();
+
+      // Proceed with login
+      io.username = username;
+      connectedUsers.push({ username: io.username });
+      io.emit('user_joined', { username: io.username, connectedUsers });
+      console.log('User created successfully');
+      // Redirect to index.html
+      io.emit('redirect', '/index.html' + "?name=" + savedUser.username + "&id=" + savedUser.id);
     }
-} catch (error) {
+  } catch (error) {
     console.error(error);
-    socket.emit('login_error', 'An error occurred during login');
+    io.emit('login_error', 'An error occurred during login');
   }
 };
