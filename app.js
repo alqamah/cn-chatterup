@@ -4,8 +4,8 @@ import { Server } from 'socket.io';
 import http from 'http';
 import cors from 'cors';
 import { connect } from './config/db.js';
-import authRoutes from './routes/authRoutes.js';
-import chatRoutes from './routes/chatRoutes.js';
+import authRoutes from './routes/auth.routes.js';
+import chatRoutes from './routes/chat.routes.js';
 import { setupSocketEvents } from './utils/socket.js';
 
 const app = express();
